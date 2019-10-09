@@ -1,0 +1,33 @@
+.qor-layout .mdl-layout__header, .qor-layout .mdl-layout__tab-bar {
+    background-color: black;
+}
+
+.qor-layout__sidebar > .sidebar-header {
+    display: block;
+    float: left;
+    color: transparent;
+    align-content: center;
+    background: url(../images/logo.jpg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 200px;
+    padding: 5px;
+    background-origin: content-box;
+}
+
+.sidebar-header h5 {
+    color: black;
+    text-align: right;
+}
+
+[qor-icon-name*="Employees"]>a::before {
+    content: "accessibility_new";
+}
+
+[qor-icon-name*="Languages"]>a::before {
+    content: "record_voice_over";
+}
+
+[qor-icon-name*="Home Addresses"]>a::before {
+    content: "home";
+}
