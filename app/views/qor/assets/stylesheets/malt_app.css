@@ -20,14 +20,14 @@
     text-align: right;
 }
 
-[qor-icon-name*="Employees"]>a::before {
-    content: "accessibility_new";
+[qor-icon-name*="Recipes"]>a::before {
+    content: "local_drink";
 }
 
-[qor-icon-name*="Languages"]>a::before {
-    content: "record_voice_over";
+[qor-icon-name*="Batches"]>a::before {
+    content: "local_offer";
 }
 
-[qor-icon-name*="Home Addresses"]>a::before {
-    content: "home";
+[qor-icon-name*="Events"]>a::before {
+    content: "event_note";
 }

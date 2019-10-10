@@ -1,13 +1,14 @@
 // This is a mock oauth2 server for development purposes
 
-package main
+package mockoauth2
 
 import (
 	"fmt"
 	"net/http"
 )
 
-func main() {
+// CreateMockOAuth2 creates a mock OAuth2 serve mux for development purposes
+func CreateMockOAuth2() *http.ServeMux {
 
 	mux := http.NewServeMux()
 
@@ -43,6 +44,5 @@ func main() {
 		fmt.Fprint(w, "Logout OK")
 	})
 
-	fmt.Println("Mock OAuth2 server listening on: http://localhost:8090")
-	http.ListenAndServe(":8090", mux)
+	return mux
 }

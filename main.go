@@ -1,11 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/nicolaspernoud/malt-app/internal/auth"
+	"github.com/nicolaspernoud/malt-app/internal/mockoauth2"
 	"github.com/nicolaspernoud/malt-app/internal/models"
 
 	"github.com/alexedwards/scs/v2"
@@ -17,12 +19,25 @@ import (
 	"github.com/qor/roles"
 )
 
-var sessionManager *scs.SessionManager
+var (
+	sessionManager *scs.SessionManager
+	debugMode      = flag.Bool("debug", false, "Debug mode, disable let's encrypt, enable CORS, mock OAuth2 server and more logging")
+)
 
 func main() {
+	// Parse flags
+	flag.Parse()
+	// Start a mock oauth2 server if debug mode is on
+	if *debugMode {
+		mockOAuth2Port := ":8090"
+		go http.ListenAndServe(mockOAuth2Port, mockoauth2.CreateMockOAuth2())
+		fmt.Println("Mock OAuth2 server Listening on: http://localhost" + mockOAuth2Port)
+	}
+
 	// Start the server
-	fmt.Println("Listening on: http://localhost:8081/admin?locale=fr-FR")
-	http.ListenAndServe(":8081", createMux())
+	httpPort := ":8081"
+	fmt.Println("Listening on: http://localhost" + httpPort + "/admin?locale=fr-FR")
+	http.ListenAndServe(httpPort, createMux())
 }
 
 func createMux() http.Handler {
@@ -33,11 +48,11 @@ func createMux() http.Handler {
 	auth.InitSM(sessionManager)
 
 	// Gather the models than will be managed by QOR
-	models := models.Export()
+	adminModels := models.Export()
 
 	// Set up the business database
 	DB, _ := gorm.Open("sqlite3", "./data/business.db")
-	DB.AutoMigrate(models...)
+	DB.AutoMigrate(adminModels...)
 
 	// Initialize
 	Admin := admin.New(&admin.AdminConfig{
@@ -47,11 +62,12 @@ func createMux() http.Handler {
 	})
 
 	// Create resources from GORM-backend model
-	for _, s := range models {
+	for _, s := range adminModels {
 		Admin.AddResource(s, &admin.Config{
 			Permission: roles.Allow(roles.Read, roles.Anyone).Allow(roles.CRUD, "admin"),
 		})
 	}
+	models.CustomizeAdmin(Admin)
 
 	// Set up translations
 	i18ndb, _ := gorm.Open("sqlite3", "./data/i18n.db")
@@ -67,7 +83,7 @@ func createMux() http.Handler {
 	Admin.MountTo("/admin", mux)
 
 	// Delete models object (enable it to be garbage collected)
-	models = nil
+	adminModels = nil
 
 	// Handle all other routes with the multiplexer
 	mux.HandleFunc("/OAuth2Login", auth.HandleOAuth2Login)
