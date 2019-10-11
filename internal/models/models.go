@@ -1,8 +1,19 @@
 package models
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/jinzhu/gorm"
+	"github.com/nicolaspernoud/malt-app/internal/auth"
 	"github.com/qor/admin"
+	"github.com/qor/roles"
+)
+
+var (
+	// DB is the application business database
+	DB *gorm.DB
 )
 
 // Recipe is a beer recipe
@@ -16,15 +27,12 @@ type Recipe struct {
 type Batch struct {
 	gorm.Model
 	RecipeID      uint
+	Step          string
 	StartVolume   int
 	CurrentVolume int
 	Events        []Event
-}
-
-// AfterCreate alters the batch volume according to the created event
-func (b *Batch) AfterCreate(tx *gorm.DB) (err error) {
-	tx.Model(b).Update("current_volume", b.StartVolume)
-	return
+	Transfers     []Transfer
+	VolumeShares  string
 }
 
 // Event is attached to a batch and can alter its volume
@@ -35,30 +43,76 @@ type Event struct {
 	Volume  int
 }
 
-// AfterCreate alters the batch volume according to the created event
-func (e *Event) AfterCreate(tx *gorm.DB) (err error) {
-	var b Batch
-	tx.Model(&Batch{}).Where("ID = ?", e.BatchID).First(&b)
-	b.CurrentVolume += e.Volume
-	tx.Save(&b)
+// Transfer is a special event attached to a batch and can alter its volume shares
+type Transfer struct {
+	gorm.Model
+	BatchID uint
+	To      Container `gorm:"foreignkey:ToID"`
+	ToID    uint
+	From    Container `gorm:"foreignkey:FromID"`
+	FromID  uint
+	Volume  int
+}
+
+// Container is where the beer is stored
+type Container struct {
+	gorm.Model
+	Name   string
+	Volume int
+}
+
+// AfterFind calculates the batch volumes according to the events
+func (b *Batch) AfterFind() (err error) {
+	// Work out the fermentation tank volume
+	var events []Event
+	DB.Where("batch_id = ?", b.ID).Find(&events)
+	b.CurrentVolume = b.StartVolume
+	for _, e := range events {
+		b.CurrentVolume += e.Volume
+	}
+	// Work out the shares between containers ; TODO : check that volumes are less than the fermentation tank volume
+	// Work out what the volumes will be (array of structs{container, volume})
+	var containers []Container
+	DB.Find(&containers)
+	m := make(map[string]int)
+	var transfers []Transfer
+	DB.Preload("From").Preload("To").Where("batch_id = ?", b.ID).Find(&transfers)
+	// For each volumes sustract the froms and add the to
+	for _, t := range transfers {
+		m[t.From.Name] -= t.Volume
+		m[t.To.Name] += t.Volume
+	}
+	var shares string
+	for key, val := range m {
+		shares += fmt.Sprintf("%s: %s, ", key, strconv.Itoa(val))
+	}
+	b.VolumeShares = strings.TrimSuffix(shares, ", ")
 	return
 }
 
-// Export generates an array of the models we want in the admin interface
-// Add here the models that you want QOR admin to manage
-func Export() []interface{} {
-	return []interface{}{&Recipe{}, &Batch{}, &Event{}}
-}
+// CreateAdmin creates an admin based on the models
+func CreateAdmin(siteName string) *admin.Admin {
+	// Set up the business database
+	DB, _ = gorm.Open("sqlite3", "./data/business.db")
+	models := []interface{}{&Recipe{}, &Batch{}, &Event{}, &Transfer{}, &Container{}}
+	DB.AutoMigrate(models...)
 
-// CustomizeAdmin customize the admin fields
-func CustomizeAdmin(Admin *admin.Admin) {
-	/*recipe := Admin.GetResource("Recipe")
-	recipe.Meta(&admin.Meta{Name: "Batches", Type: "select_many", Config: &admin.SelectManyConfig{SelectMode: "bottom_sheet"}})
+	// Initialize
+	Admin := admin.New(&admin.AdminConfig{
+		DB:       DB,
+		SiteName: siteName,
+		Auth:     &auth.Auth{AuthLoginURL: "/OAuth2Login", AuthLogoutURL: "/logout"},
+	})
+
+	// Create resources from GORM-backend model
+	for _, s := range models {
+		Admin.AddResource(s, &admin.Config{
+			Permission: roles.Allow(roles.Read, roles.Anyone).Allow(roles.CRUD, "admin"),
+		})
+	}
 
 	batch := Admin.GetResource("Batch")
-	batch.Meta(&admin.Meta{Name: "Events", Type: "select_many", Config: &admin.SelectManyConfig{SelectMode: "bottom_sheet"}})
-	//batch.Meta(&admin.Meta{Name: "RecipeID", Type: "select_one"})*/
+	batch.Meta(&admin.Meta{Name: "Step", Type: "select_one", Config: &admin.SelectOneConfig{Collection: []string{"mixed", "brewed", "fermented"}}})
 
-	//event := Admin.GetResource("Event")
-	//event.Meta(&admin.Meta{Name: "BatchID", Type: "select_one"})
+	return Admin
 }

@@ -16,7 +16,6 @@ import (
 	"github.com/qor/admin"
 	"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/database"
-	"github.com/qor/roles"
 )
 
 var (
@@ -47,27 +46,8 @@ func createMux() http.Handler {
 	auth.Init()
 	auth.InitSM(sessionManager)
 
-	// Gather the models than will be managed by QOR
-	adminModels := models.Export()
-
-	// Set up the business database
-	DB, _ := gorm.Open("sqlite3", "./data/business.db")
-	DB.AutoMigrate(adminModels...)
-
-	// Initialize
-	Admin := admin.New(&admin.AdminConfig{
-		DB:       DB,
-		SiteName: "Malt App",
-		Auth:     &auth.Auth{AuthLoginURL: "/OAuth2Login", AuthLogoutURL: "/logout"},
-	})
-
-	// Create resources from GORM-backend model
-	for _, s := range adminModels {
-		Admin.AddResource(s, &admin.Config{
-			Permission: roles.Allow(roles.Read, roles.Anyone).Allow(roles.CRUD, "admin"),
-		})
-	}
-	models.CustomizeAdmin(Admin)
+	// Attach models to Admin
+	Admin := models.CreateAdmin("Malt App")
 
 	// Set up translations
 	i18ndb, _ := gorm.Open("sqlite3", "./data/i18n.db")
@@ -81,9 +61,6 @@ func createMux() http.Handler {
 
 	// Mount admin to the mux
 	Admin.MountTo("/admin", mux)
-
-	// Delete models object (enable it to be garbage collected)
-	adminModels = nil
 
 	// Handle all other routes with the multiplexer
 	mux.HandleFunc("/OAuth2Login", auth.HandleOAuth2Login)
