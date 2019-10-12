@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/nicolaspernoud/malt-app/internal/auth"
@@ -27,12 +28,14 @@ type Batch struct {
 	gorm.Model
 	Recipe        Recipe `gorm:"foreignkey:RecipeID;not null"`
 	RecipeID      uint   `gorm:"not null"`
+	Date          time.Time
 	Step          string
 	StartVolume   int
 	CurrentVolume int
 	Events        []Event
 	Transfers     []Transfer
-	VolumeShares  string
+	Sales         []Sale
+	Stock         string
 }
 
 // Event is attached to a batch and can alter its volume
@@ -40,17 +43,29 @@ type Event struct {
 	gorm.Model
 	BatchID uint
 	Name    string
+	Date    time.Time
 	Volume  int
 }
 
-// Transfer is a special event attached to a batch and can alter its volume shares
+// Transfer is a special event attached to a batch and can alter its stock
 type Transfer struct {
 	gorm.Model
 	BatchID uint
+	Date    time.Time
 	From    Container `gorm:"foreignkey:FromID"`
 	FromID  uint
 	To      Container `gorm:"foreignkey:ToID"`
 	ToID    uint
+	Volume  int
+}
+
+// Sale is a special event attached to a batch and can alter its stock
+type Sale struct {
+	gorm.Model
+	BatchID uint
+	Date    time.Time
+	From    Container `gorm:"foreignkey:FromID"`
+	FromID  uint
 	Volume  int
 }
 
@@ -63,13 +78,11 @@ type Container struct {
 
 // AfterFind calculates the batch volumes according to the events
 func (b *Batch) AfterFind() (err error) {
-	b.VolumeShares = "brew not yet fermented"
-	// If the brew is not yet fermented, returns volumes infos
+	b.Stock = "brew not yet fermented"
 	if b.Step == "mixed" {
 		b.CurrentVolume = 0
 		return
 	}
-
 	// Work out the fermentation tank volume
 	var events []Event
 	DB.Where("batch_id = ?", b.ID).Find(&events)
@@ -77,15 +90,19 @@ func (b *Batch) AfterFind() (err error) {
 	for _, e := range events {
 		b.CurrentVolume += e.Volume
 	}
-	// Work out the shares between containers ; TODO : check that volumes are less than the fermentation tank volume
+	// Work out the stocks between containers ; TODO : check that volumes are less than the fermentation tank volume
 	if b.Step != "fermented" {
 		return
 	}
 	var containers []Container
 	DB.Find(&containers)
 	m := make(map[string]int)
+	// Get the transfers
 	var transfers []Transfer
 	DB.Preload("From").Preload("To").Where("batch_id = ?", b.ID).Find(&transfers)
+	// Get the sales
+	var sales []Sale
+	DB.Preload("From").Where("batch_id = ?", b.ID).Find(&sales)
 	// Init the stock with the fermenter volume
 	m["Fermenter"] = b.CurrentVolume
 	// For each volumes sustract the froms and add the to
@@ -93,11 +110,14 @@ func (b *Batch) AfterFind() (err error) {
 		m[t.From.Name] -= t.Volume
 		m[t.To.Name] += t.Volume
 	}
-	var shares string
-	for key, val := range m {
-		shares += fmt.Sprintf("%s: %s, ", key, strconv.Itoa(val))
+	for _, s := range sales {
+		m[s.From.Name] -= s.Volume
 	}
-	b.VolumeShares = strings.TrimSuffix(shares, ", ")
+	var stocks string
+	for key, val := range m {
+		stocks += fmt.Sprintf("%s: %s, ", key, strconv.Itoa(val))
+	}
+	b.Stock = strings.TrimSuffix(stocks, ", ")
 	return
 }
 
@@ -105,7 +125,7 @@ func (b *Batch) AfterFind() (err error) {
 func CreateAdmin(siteName string) *admin.Admin {
 	// Set up the business database
 	DB, _ = gorm.Open("sqlite3", "./data/business.db")
-	models := []interface{}{&Recipe{}, &Batch{}, &Event{}, &Transfer{}, &Container{}}
+	models := []interface{}{&Recipe{}, &Batch{}, &Event{}, &Transfer{}, &Container{}, &Sale{}}
 	DB.AutoMigrate(models...)
 
 	// Create the fermenter container if it doesn't exists
