@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/nicolaspernoud/malt-app/internal/auth"
+	"github.com/nicolaspernoud/malt_app/internal/auth"
 	"github.com/qor/admin"
 	"github.com/qor/roles"
 )

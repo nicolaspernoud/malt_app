@@ -9,8 +9,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nicolaspernoud/malt-app/internal/auth"
-	"github.com/nicolaspernoud/malt-app/tester"
+	"github.com/nicolaspernoud/malt_app/internal/auth"
+	"github.com/nicolaspernoud/malt_app/tester"
 )
 
 func setupMockOAuthServer() *httptest.Server {

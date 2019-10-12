@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nicolaspernoud/malt-app/internal/auth"
-	"github.com/nicolaspernoud/malt-app/internal/mockoauth2"
-	"github.com/nicolaspernoud/malt-app/internal/models"
+	"github.com/nicolaspernoud/malt_app/internal/auth"
+	"github.com/nicolaspernoud/malt_app/internal/mockoauth2"
+	"github.com/nicolaspernoud/malt_app/internal/models"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/jinzhu/gorm"

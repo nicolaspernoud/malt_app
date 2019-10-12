@@ -4,7 +4,7 @@ This application is based upon [QOR](https://github.com/qor/qor).
 
 ## Install
 
-Clone the repository and `cd malt-app`.
+Clone the repository and `cd malt_app`.
 
 ## Use with docker
 

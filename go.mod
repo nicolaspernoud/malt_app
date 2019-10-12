@@ -1,4 +1,4 @@
-module github.com/nicolaspernoud/malt-app
+module github.com/nicolaspernoud/malt_app
 
 go 1.12
 
@@ -13,15 +13,14 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
-	github.com/gosimple/slug v1.7.0 // indirect
+	github.com/gosimple/slug v1.8.0 // indirect
 	github.com/jinzhu/configor v1.1.1 // indirect
-	github.com/jinzhu/gorm v1.9.10
+	github.com/jinzhu/gorm v1.9.11
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
-	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
-	github.com/nicolaspernoud/ninicobox-v3-server v0.0.0-20190917095824-93582eb7dd65
+	github.com/nicolaspernoud/ninicobox-v3-server v0.0.0-20191007180054-6e4b7ea3d7b3
 	github.com/qor/admin v0.0.0-20190906081516-5593fc33b920
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
 	github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba // indirect
@@ -41,7 +40,7 @@ require (
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
 	github.com/yosssi/gohtml v0.0.0-20190128141317-9b7db94d32d9 // indirect
 	golang.org/x/image v0.0.0-20190823064033-3a9bac650e44 // indirect
-	golang.org/x/net v0.0.0-20190918130420-a8b05e9114ab // indirect
+	golang.org/x/net v0.0.0-20191011234655-491137f69257 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	google.golang.org/appengine v1.6.2 // indirect
+	google.golang.org/appengine v1.6.5 // indirect
 )
