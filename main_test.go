@@ -119,7 +119,7 @@ func TestEndToEnd(t *testing.T) {
 	// Try to login (must pass)
 	tester.DoRequestOnServer(t, userJar, port, "GET", "/admin", "", "", 200, "")
 	// Try to access something (must pass)
-	tester.DoRequestOnServer(t, userJar, port, "GET", "/admin/employees.json", "", "", 200, `[]`)
+	tester.DoRequestOnServer(t, userJar, port, "GET", "/admin/batches.json", "", "", 200, `[]`)
 
 	// Logout
 	tester.DoRequestOnServer(t, userJar, port, "GET", "/logout", "", "Logout OK", 200, "")
