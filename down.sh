@@ -1,3 +1,3 @@
 #!/bin/bash
-docker stop malt-qor
-docker rm malt-qor
+docker stop malt_app
+docker rm malt_app

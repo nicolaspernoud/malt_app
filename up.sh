@@ -15,7 +15,7 @@ set +a
 ./keycloak/keycloak-up.sh
 
 # START QOR
-docker run -d --name malt-qor \
+docker run -d --name malt_app \
     --restart unless-stopped \
     -v /etc/localtime:/etc/localtime:ro \
     -v /etc/timezone:/etc/timezone:ro \
@@ -30,9 +30,9 @@ docker run -d --name malt-qor \
     -e USERINFO_URL=${USERINFO_URL} \
     -e LOGOUT_URL=${LOGOUT_URL} \
     -e ADMIN_GROUP=${ADMIN_GROUP} \
-    malt-qor
+    malt_app
 
 # Let it start...
 sleep 20
 echo  "*** Ready to go ! ***"
-docker logs malt-qor
+docker logs malt_app

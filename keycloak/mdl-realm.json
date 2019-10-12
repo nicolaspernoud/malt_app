@@ -264,7 +264,7 @@
         "containerId" : "efee18f4-a97f-4f01-a260-7e9901886030",
         "attributes" : { }
       } ],
-      "malt-qor" : [ ]
+      "malt_app" : [ ]
     }
   },
   "groups" : [ {
@@ -402,7 +402,7 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "7d590712-5635-443a-913e-b0ae1bf9edc2",
-    "clientId" : "malt-qor",
+    "clientId" : "malt_app",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "clientAuthenticatorType" : "client-secret",

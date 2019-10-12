@@ -3,4 +3,4 @@ WD="$(
     cd "$(dirname "$0")"
     pwd -P
 )"
-docker build -t malt-qor $WD
+docker build -t malt_app $WD

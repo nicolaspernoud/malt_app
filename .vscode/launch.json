@@ -15,7 +15,7 @@
             "program": "${workspaceFolder}/main.go",
             "env": {
                 "REDIRECT_URL": "http://localhost:8081/OAuth2Callback",
-                "CLIENT_ID": "malt-qor",
+                "CLIENT_ID": "malt_app",
                 "CLIENT_SECRET": "d9e0cf41-11c6-4ef1-9d07-17e21bd352db",
                 "AUTH_URL": "http://localhost:8090/auth",
                 "TOKEN_URL": "http://localhost:8090/token",
