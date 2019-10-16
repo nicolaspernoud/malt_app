@@ -20,7 +20,7 @@ import (
 
 var (
 	sessionManager *scs.SessionManager
-	debugMode      = flag.Bool("debug", false, "Debug mode, disable let's encrypt, enable CORS, mock OAuth2 server and more logging")
+	debugMode      = flag.Bool("debug", false, "Debug mode, enables mock OAuth2 server")
 )
 
 func main() {

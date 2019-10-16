@@ -28,14 +28,6 @@
     content: "local_offer";
 }
 
-[qor-icon-name*="Events"]>a::before {
-    content: "event_note";
-}
-
-[qor-icon-name*="Transfers"]>a::before {
-    content: "redo";
-}
-
 [qor-icon-name*="Containers"]>a::before {
     content: "hot_tub";
 }

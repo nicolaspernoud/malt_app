@@ -129,7 +129,7 @@ func CreateAdmin(siteName string) *admin.Admin {
 	DB.AutoMigrate(models...)
 
 	// Create the fermenter container if it doesn't exists
-	createFermenter(DB)
+	DB.FirstOrCreate(&Container{}, Container{Name: "Fermenter"})
 
 	// Initialize
 	Admin := admin.New(&admin.AdminConfig{
@@ -169,10 +169,3 @@ func CreateAdmin(siteName string) *admin.Admin {
 	}
 	return options
 }*/
-
-func createFermenter(db *gorm.DB) {
-	fermenter := Container{Name: "Fermenter"}
-	if db.NewRecord(fermenter) {
-		db.Create(&fermenter)
-	}
-}
