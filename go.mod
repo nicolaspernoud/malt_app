@@ -19,7 +19,7 @@ require (
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.20 // indirect
 	github.com/nicolaspernoud/ninicobox-v3-server v0.0.0-20191007180054-6e4b7ea3d7b3
 	github.com/qor/admin v0.0.0-20190906081516-5593fc33b920
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
