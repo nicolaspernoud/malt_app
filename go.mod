@@ -7,7 +7,7 @@ require (
 	github.com/alexedwards/scs/v2 v2.2.0
 	github.com/andybalholm/cascadia v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
-	github.com/aws/aws-sdk-go v1.23.8 // indirect
+	github.com/aws/aws-sdk-go v1.34.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190820223206-44cdfe8d8ba9 // indirect
 	github.com/disintegration/imaging v1.6.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
